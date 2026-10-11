@@ -5,89 +5,92 @@
 using Table = std::vector<std::vector<int>>;
 
 struct Placement {
-  int total_cost = 0;
-  std::vector<int> points{};
+    int total_cost = 0;
+    std::vector<int> points;
 };
 
-void optimize_input() {
-  std::ios::sync_with_stdio(false);
-  std::cin.tie(nullptr);
+void optimizeInput() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
 }
 
-std::vector<int> read_houses(int n) {
-  std::vector<int> houses(n + 1, 0);
-  for (int i = 1; i <= n; ++i) {
-    std::cin >> houses[i];
-  }
-  return houses;
-}
-
-Table build_group_costs(const std::vector<int>& houses) {
-  const int n = static_cast<int>(houses.size()) - 1;
-  std::vector<int> prefix(n + 1, 0);
-  for (int i = 1; i <= n; ++i) {
-    prefix[i] = prefix[i - 1] + houses[i];
-  }
-  Table cost(n + 1, std::vector<int>(n + 1, 0));
-  for (int left = 1; left <= n; ++left) {
-    for (int right = left; right <= n; ++right) {
-      const int median = (left + right) / 2;
-      cost[left][right] = houses[median] * (median - left + 1)
-                          - (prefix[median] - prefix[left - 1]) + prefix[right]
-                          - prefix[median] - houses[median] * (right - median);
+std::vector<int> readHouses(int house_count) {
+    std::vector<int> houses(house_count + 1, 0);
+    for (int i = 1; i <= house_count; ++i) {
+        std::cin >> houses[i];
     }
-  }
-  return cost;
+    return houses;
 }
 
-std::vector<int> restore_points(const std::vector<int>& houses,
-                                const Table& split, int m) {
-  std::vector<int> points{};
-  int right = static_cast<int>(houses.size()) - 1;
-  for (int groups = m; groups > 0; --groups) {
-    const int left = split[groups][right];
-    points.push_back(houses[(left + 1 + right) / 2]);
-    right = left;
-  }
-  std::reverse(points.begin(), points.end());
-  return points;
-}
-
-Placement choose_points(const std::vector<int>& houses, int m) {
-  constexpr int INF = 1000000000;
-  const int n = static_cast<int>(houses.size()) - 1;
-  const auto cost = build_group_costs(houses);
-  Table dp(m + 1, std::vector<int>(n + 1, INF));
-  Table split(m + 1, std::vector<int>(n + 1, 0));
-  dp[0][0] = 0;
-  for (int groups = 1; groups <= m; ++groups) {
-    for (int right = groups; right <= n; ++right) {
-      for (int left = groups - 1; left < right; ++left) {
-        const int candidate = dp[groups - 1][left] + cost[left + 1][right];
-        if (candidate < dp[groups][right]) {
-          dp[groups][right] = candidate;
-          split[groups][right] = left;
+Table buildGroupCosts(const std::vector<int>& houses) {
+    const int house_count = static_cast<int>(houses.size()) - 1;
+    std::vector<int> prefix(house_count + 1, 0);
+    for (int i = 1; i <= house_count; ++i) {
+        prefix[i] = prefix[i - 1] + houses[i];
+    }
+    Table cost(house_count + 1, std::vector<int>(house_count + 1, 0));
+    for (int left = 1; left <= house_count; ++left) {
+        for (int right = left; right <= house_count; ++right) {
+            const int median  = (left + right) / 2;
+            cost[left][right] = (houses[median] * (median - left + 1))
+                                - (prefix[median] - prefix[left - 1])
+                                + prefix[right] - prefix[median]
+                                - (houses[median] * (right - median));
         }
-      }
     }
-  }
-  return {dp[m][n], restore_points(houses, split, m)};
+    return cost;
 }
 
-void print_placement(const Placement& placement) {
-  std::cout << placement.total_cost << '\n';
-  for (int coordinate : placement.points) {
-    std::cout << coordinate << ' ';
-  }
-  std::cout << '\n';
+std::vector<int> restorePoints(const std::vector<int>& houses,
+                               const Table& split, int point_count) {
+    std::vector<int> points{};
+    int right = static_cast<int>(houses.size()) - 1;
+    for (int groups = point_count; groups > 0; --groups) {
+        const int left = split[groups][right];
+        points.push_back(houses[(left + 1 + right) / 2]);
+        right = left;
+    }
+    std::reverse(points.begin(), points.end());
+    return points;
+}
+
+Placement choosePoints(const std::vector<int>& houses, int point_count) {
+    constexpr int inf     = 1000000000;
+    const int house_count = static_cast<int>(houses.size()) - 1;
+    const auto cost       = buildGroupCosts(houses);
+    Table best(point_count + 1, std::vector<int>(house_count + 1, inf));
+    Table split(point_count + 1, std::vector<int>(house_count + 1, 0));
+    best[0][0] = 0;
+    for (int groups = 1; groups <= point_count; ++groups) {
+        for (int right = groups; right <= house_count; ++right) {
+            for (int left = groups - 1; left < right; ++left) {
+                const int candidate =
+                    best[groups - 1][left] + cost[left + 1][right];
+                if (candidate < best[groups][right]) {
+                    best[groups][right]  = candidate;
+                    split[groups][right] = left;
+                }
+            }
+        }
+    }
+    return {best[point_count][house_count],
+            restorePoints(houses, split, point_count)};
+}
+
+void printPlacement(const Placement& placement) {
+    std::cout << placement.total_cost << '\n';
+    for (int coordinate : placement.points) {
+        std::cout << coordinate << ' ';
+    }
+    std::cout << '\n';
 }
 
 int main() {
-  optimize_input();
+    optimizeInput();
 
-  int n = 0;
-  int m = 0;
-  std::cin >> n >> m;
-  const auto houses = read_houses(n);
-  print_placement(choose_points(houses, m));
+    int house_count = 0;
+    int point_count = 0;
+    std::cin >> house_count >> point_count;
+    const auto houses = readHouses(house_count);
+    printPlacement(choosePoints(houses, point_count));
 }

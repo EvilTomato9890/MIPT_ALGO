@@ -1,13 +1,13 @@
 ---
 BasedOnStyle: Google
-AccessModifierOffset: -1
+AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: None
 AlignConsecutiveAssignments:
-  Enabled: false
+  Enabled: true
   AcrossEmptyLines: false
   AcrossComments: false
-  AlignCompound: false
+  AlignCompound: true
   AlignFunctionPointers: false
   PadOperators: true
 AlignConsecutiveBitFields:
@@ -161,7 +161,7 @@ IndentExternBlock: AfterExternBlock
 IndentGotoLabels: true
 IndentPPDirectives: None
 IndentRequiresClause: true
-IndentWidth: 2
+IndentWidth: 4
 IndentWrappedFunctionNames: false
 InsertBraces: false
 InsertNewlineAtEOF: false
@@ -183,7 +183,7 @@ LambdaBodyIndentation: Signature
 LineEnding: DeriveLF
 MacroBlockBegin: ""
 MacroBlockEnd: ""
-MainIncludeChar: Quote
+MainIncludeChar: Any
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 ObjCBinPackProtocolList: Never
@@ -246,7 +246,9 @@ RequiresExpressionIndentation: OuterScope
 SeparateDefinitionBlocks: Leave
 ShortNamespaceLines: 2
 SkipMacroDefinitionBody: false
-SortIncludes: Never
+SortIncludes:
+  Enabled: true
+  IgnoreCase: false
 SortJavaStaticImport: Before
 SortUsingDeclarations: LexicographicNumeric
 SpaceAfterCStyleCast: false
@@ -294,7 +296,7 @@ StatementAttributeLikeMacros:
 StatementMacros:
   - Q_UNUSED
   - QT_REQUIRE_VERSION
-TabWidth: 8
+TabWidth: 4
 TableGenBreakInsideDAGArg: DontBreak
 UseTab: Never
 VerilogBreakBetweenInstancePorts: true

@@ -2,30 +2,31 @@
 #include <iostream>
 #include <utility>
 
-constexpr std::int64_t MOD = 1000003;
+constexpr std::int64_t kMod = 1000003;
 
-void optimize_input() {
-  std::ios::sync_with_stdio(false);
-  std::cin.tie(nullptr);
+void optimizeInput() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
 }
 
-std::pair<std::int64_t, std::int64_t> fibonacci(std::uint64_t n) {
-  if (n == 0) {
-    return {0, 1};
-  }
-  const auto [a, b] = fibonacci(n / 2);
-  const auto c = a * ((2 * b - a + MOD) % MOD) % MOD;
-  const auto d = (a * a + b * b) % MOD;
-  if (n % 2 == 0) {
-    return {c, d};
-  }
-  return {d, (c + d) % MOD};
+std::pair<std::int64_t, std::int64_t> fibonacci(std::uint64_t index) {
+    if (index == 0) {
+        return {0, 1};
+    }
+    const auto [current, next] = fibonacci(index / 2);
+    const auto doubled =
+        current * (((2 * next) - current + kMod) % kMod) % kMod;
+    const auto doubled_next = ((current * current) + (next * next)) % kMod;
+    if (index % 2 == 0) {
+        return {doubled, doubled_next};
+    }
+    return {doubled_next, (doubled + doubled_next) % kMod};
 }
 
 int main() {
-  optimize_input();
+    optimizeInput();
 
-  std::uint64_t n = 0;
-  std::cin >> n;
-  std::cout << fibonacci(n - 1).first << '\n';
+    std::uint64_t index = 0;
+    std::cin >> index;
+    std::cout << fibonacci(index - 1).first << '\n';
 }

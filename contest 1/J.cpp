@@ -6,72 +6,78 @@
 using Table = std::vector<std::vector<int>>;
 
 struct CommonDance {
-  std::vector<int> first{};
-  std::vector<int> second{};
+    std::vector<int> first;
+    std::vector<int> second;
 };
 
-void optimize_input() {
-  std::ios::sync_with_stdio(false);
-  std::cin.tie(nullptr);
+void optimizeInput() {
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
 }
 
-Table build_lcs_table(const std::string& a, const std::string& b) {
-  const int n = static_cast<int>(a.size());
-  const int m = static_cast<int>(b.size());
-  Table dp(n + 1, std::vector<int>(m + 1, 0));
-  for (int i = 1; i <= n; ++i) {
-    for (int j = 1; j <= m; ++j) {
-      if (a[i - 1] == b[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1] + 1;
-      } else {
-        dp[i][j] = std::max(dp[i - 1][j], dp[i][j - 1]);
-      }
+Table buildLcsTable(const std::string& first_text,
+                    const std::string& second_text) {
+    const int first_length  = static_cast<int>(first_text.size());
+    const int second_length = static_cast<int>(second_text.size());
+    Table best(first_length + 1, std::vector<int>(second_length + 1, 0));
+    for (int first_index = 1; first_index <= first_length; ++first_index) {
+        for (int second_index = 1; second_index <= second_length;
+             ++second_index) {
+            if (first_text[first_index - 1] == second_text[second_index - 1]) {
+                best[first_index][second_index] =
+                    best[first_index - 1][second_index - 1] + 1;
+            } else {
+                best[first_index][second_index] =
+                    std::max(best[first_index - 1][second_index],
+                             best[first_index][second_index - 1]);
+            }
+        }
     }
-  }
-  return dp;
+    return best;
 }
 
-CommonDance restore_dance(const std::string& a, const std::string& b,
-                          const Table& dp) {
-  CommonDance dance{};
-  int i = static_cast<int>(a.size());
-  int j = static_cast<int>(b.size());
-  while (i > 0 && j > 0) {
-    if (a[i - 1] == b[j - 1]) {
-      dance.first.push_back(i);
-      dance.second.push_back(j);
-      --i;
-      --j;
-    } else if (dp[i - 1][j] >= dp[i][j - 1]) {
-      --i;
-    } else {
-      --j;
+CommonDance restoreDance(const std::string& first_text,
+                         const std::string& second_text, const Table& best) {
+    CommonDance dance{};
+    int first_index  = static_cast<int>(first_text.size());
+    int second_index = static_cast<int>(second_text.size());
+    while (first_index > 0 && second_index > 0) {
+        if (first_text[first_index - 1] == second_text[second_index - 1]) {
+            dance.first.push_back(first_index);
+            dance.second.push_back(second_index);
+            --first_index;
+            --second_index;
+        } else if (best[first_index - 1][second_index]
+                   >= best[first_index][second_index - 1]) {
+            --first_index;
+        } else {
+            --second_index;
+        }
     }
-  }
-  std::reverse(dance.first.begin(), dance.first.end());
-  std::reverse(dance.second.begin(), dance.second.end());
-  return dance;
+    std::reverse(dance.first.begin(), dance.first.end());
+    std::reverse(dance.second.begin(), dance.second.end());
+    return dance;
 }
 
-void print_indices(const std::vector<int>& indices) {
-  for (int index : indices) {
-    std::cout << index << ' ';
-  }
-  std::cout << '\n';
+void printIndices(const std::vector<int>& indices) {
+    for (int index : indices) {
+        std::cout << index << ' ';
+    }
+    std::cout << '\n';
 }
 
-void print_dance(const CommonDance& dance) {
-  std::cout << dance.first.size() << '\n';
-  print_indices(dance.first);
-  print_indices(dance.second);
+void printDance(const CommonDance& dance) {
+    std::cout << dance.first.size() << '\n';
+    printIndices(dance.first);
+    printIndices(dance.second);
 }
 
 int main() {
-  optimize_input();
+    optimizeInput();
 
-  std::string a{};
-  std::string b{};
-  std::cin >> a >> b;
-  const auto dp = build_lcs_table(a, b);
-  print_dance(restore_dance(a, b, dp));
+    std::string first_text{};
+    std::string second_text{};
+    std::cin >> first_text >> second_text;
+    const auto best = buildLcsTable(first_text, second_text);
+    printDance(restoreDance(first_text, second_text, best));
 }
